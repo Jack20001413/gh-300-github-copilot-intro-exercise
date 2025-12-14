@@ -5,7 +5,7 @@ import secrets
 import hashlib
 import base64
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 from fastapi import HTTPException, Request, Response
 from jose import jwt, JWTError
@@ -24,7 +24,7 @@ refresh_tokens: Dict[str, Dict[str, Any]] = {}
 
 def cleanup_expired_sessions():
     """Remove expired sessions to prevent memory leaks"""
-    current_time = datetime.utcnow()
+    current_time = datetime.now(timezone.utc)
     expired_sessions = [
         token for token, data in sessions.items()
         if data.get("expires", current_time) < current_time
@@ -58,9 +58,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """Create JWT access token"""
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     
     to_encode.update({"exp": expire, "type": "access"})
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
@@ -70,7 +70,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 def create_refresh_token(user_id: str):
     """Create refresh token"""
     token = secrets.token_urlsafe(32)
-    expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     
     refresh_tokens[token] = {
         "user_id": user_id,
@@ -96,7 +96,7 @@ def verify_refresh_token(token: str) -> Optional[str]:
     if not token_data:
         return None
     
-    if datetime.utcnow() > token_data["expires"]:
+    if datetime.now(timezone.utc) > token_data["expires"]:
         del refresh_tokens[token]
         return None
     
@@ -165,7 +165,7 @@ def get_session_user(request: Request) -> Optional[dict]:
         return None
     
     # Check if session has expired
-    if datetime.utcnow() > session.get("expires", datetime.utcnow()):
+    if datetime.now(timezone.utc) > session.get("expires", datetime.now(timezone.utc)):
         del sessions[session_token]
         return None
     
@@ -175,7 +175,7 @@ def get_session_user(request: Request) -> Optional[dict]:
 def create_session(user: dict, response: Response):
     """Create a new session for user"""
     session_token = secrets.token_urlsafe(32)
-    expires = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expires = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     
     sessions[session_token] = {
         "user": user,
