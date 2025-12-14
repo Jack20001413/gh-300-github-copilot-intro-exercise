@@ -2,3 +2,8 @@ fastapi
 uvicorn
 pytest
 httpx
+authlib
+itsdangerous
+python-dotenv
+python-jose[cryptography]
+passlib[bcrypt]
