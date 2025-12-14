@@ -2,7 +2,11 @@
 Configuration module for OAuth settings
 """
 import os
+import logging
 from dotenv import load_dotenv
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -13,6 +17,13 @@ class Settings:
     # Secret keys
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
     SESSION_SECRET: str = os.getenv("SESSION_SECRET", "dev-session-secret-change-in-production")
+    
+    def __init__(self):
+        # Warn if using default secrets in production
+        if self.SECRET_KEY == "dev-secret-key-change-in-production":
+            logger.warning("Using default SECRET_KEY! Change this in production!")
+        if self.SESSION_SECRET == "dev-session-secret-change-in-production":
+            logger.warning("Using default SESSION_SECRET! Change this in production!")
     
     # OAuth settings
     OAUTH_CLIENT_ID: str = os.getenv("OAUTH_CLIENT_ID", "")

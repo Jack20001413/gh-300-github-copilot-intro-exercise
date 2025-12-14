@@ -4,12 +4,16 @@ OAuth 2.0 authentication module with PKCE support
 import secrets
 import hashlib
 import base64
+import logging
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from fastapi import HTTPException, Request, Response
 from jose import jwt, JWTError
 import httpx
 from src.config import settings
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # In-memory storage for sessions and tokens (in production, use Redis or database)
 # Note: For production deployments, replace with Redis or database backend
@@ -119,7 +123,7 @@ async def get_oauth_user_info(access_token: str) -> Optional[dict]:
             if response.status_code == 200:
                 return response.json()
         except (httpx.RequestError, httpx.HTTPStatusError) as e:
-            print(f"Error fetching user info: {e}")
+            logger.error(f"Error fetching user info: {e}")
     return None
 
 
@@ -143,7 +147,7 @@ async def exchange_code_for_token(code: str, code_verifier: str) -> Optional[dic
             if response.status_code == 200:
                 return response.json()
         except (httpx.RequestError, httpx.HTTPStatusError) as e:
-            print(f"Error exchanging code for token: {e}")
+            logger.error(f"Error exchanging code for token: {e}")
     return None
 
 

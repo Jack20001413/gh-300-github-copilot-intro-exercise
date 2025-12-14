@@ -5,6 +5,7 @@ A super simple FastAPI application that allows students to view and sign up
 for extracurricular activities at Mergington High School.
 """
 
+from datetime import datetime, timedelta
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse, JSONResponse
@@ -105,7 +106,7 @@ async def login(request: Request):
     auth.sessions[session_token] = {
         "code_verifier": code_verifier,
         "state": state,
-        "expires": auth.datetime.utcnow() + auth.timedelta(minutes=10)
+        "expires": datetime.utcnow() + timedelta(minutes=10)
     }
     
     # Build authorization URL
