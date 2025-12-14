@@ -208,3 +208,39 @@ footer {
   padding: 20px;
   color: #666;
 }
+
+#auth-status {
+  font-size: 14px;
+}
+
+#auth-status button {
+  padding: 5px 15px;
+  font-size: 14px;
+}
+
+#login-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+#login-container section {
+  text-align: center;
+  max-width: 400px;
+}
+
+#login-container button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+}
+
+#app-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+  width: 100%;
+}

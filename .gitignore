@@ -1,4 +1,6 @@
 *.temp*
+.env
+.env.*
 
 # Compiled source #
 ###################
