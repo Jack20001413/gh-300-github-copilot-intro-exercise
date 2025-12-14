@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const activity = button.getAttribute('data-activity');
     const email = button.getAttribute('data-email');
 
-    if (!confirm(`Are you sure you want to unregister from ${activity}?`)) {
+    if (!confirm(`Are you sure you want to unregister from '${activity}'?`)) {
       return;
     }
 

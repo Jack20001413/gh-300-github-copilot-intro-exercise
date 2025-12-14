@@ -3,6 +3,7 @@ Test suite for the Mergington High School API
 """
 
 import pytest
+from datetime import datetime, timedelta
 from fastapi.testclient import TestClient
 from src.app import app, activities
 from src import auth
@@ -26,7 +27,7 @@ def create_test_session(client, email="testuser@mergington.edu", name="Test User
     session_token = "test-session-token"
     auth.sessions[session_token] = {
         "user": user,
-        "expires": auth.datetime.utcnow() + auth.timedelta(hours=1)
+        "expires": datetime.utcnow() + timedelta(hours=1)
     }
     # Set the cookie on the client
     client.cookies.set("session_token", session_token)

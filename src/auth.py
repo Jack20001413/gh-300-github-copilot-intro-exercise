@@ -12,8 +12,28 @@ import httpx
 from src.config import settings
 
 # In-memory storage for sessions and tokens (in production, use Redis or database)
+# Note: For production deployments, replace with Redis or database backend
+# to support multiple server instances and prevent memory leaks
 sessions: Dict[str, Dict[str, Any]] = {}
 refresh_tokens: Dict[str, Dict[str, Any]] = {}
+
+
+def cleanup_expired_sessions():
+    """Remove expired sessions to prevent memory leaks"""
+    current_time = datetime.utcnow()
+    expired_sessions = [
+        token for token, data in sessions.items()
+        if data.get("expires", current_time) < current_time
+    ]
+    for token in expired_sessions:
+        del sessions[token]
+    
+    expired_refresh = [
+        token for token, data in refresh_tokens.items()
+        if data.get("expires", current_time) < current_time
+    ]
+    for token in expired_refresh:
+        del refresh_tokens[token]
 
 
 def generate_pkce_pair():
@@ -98,8 +118,8 @@ async def get_oauth_user_info(access_token: str) -> Optional[dict]:
             )
             if response.status_code == 200:
                 return response.json()
-        except Exception:
-            pass
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
+            print(f"Error fetching user info: {e}")
     return None
 
 
@@ -122,13 +142,16 @@ async def exchange_code_for_token(code: str, code_verifier: str) -> Optional[dic
             )
             if response.status_code == 200:
                 return response.json()
-        except Exception:
-            pass
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
+            print(f"Error exchanging code for token: {e}")
     return None
 
 
 def get_session_user(request: Request) -> Optional[dict]:
     """Get user from session cookie"""
+    # Periodically clean up expired sessions
+    cleanup_expired_sessions()
+    
     session_token = request.cookies.get("session_token")
     if not session_token:
         return None
