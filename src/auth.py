@@ -179,11 +179,12 @@ def create_session(user: dict, response: Response):
     }
     
     # Set httpOnly cookie for session
+    # Note: secure flag should be True in production with HTTPS
     response.set_cookie(
         key="session_token",
         value=session_token,
         httponly=True,
-        secure=False,  # Set to True in production with HTTPS
+        secure=settings.SECURE_COOKIES,
         samesite="lax",
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
@@ -194,7 +195,7 @@ def create_session(user: dict, response: Response):
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=False,  # Set to True in production with HTTPS
+        secure=settings.SECURE_COOKIES,
         samesite="lax",
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
     )

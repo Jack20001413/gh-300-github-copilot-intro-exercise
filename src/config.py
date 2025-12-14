@@ -33,5 +33,9 @@ class Settings:
     
     # Algorithm for JWT
     ALGORITHM: str = "HS256"
+    
+    # Security settings
+    # Set to True in production (requires HTTPS)
+    SECURE_COOKIES: bool = os.getenv("SECURE_COOKIES", "false").lower() == "true"
 
 settings = Settings()

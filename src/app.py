@@ -121,11 +121,13 @@ async def login(request: Request):
     auth_url = f"{settings.OAUTH_AUTHORIZE_URL}?{urlencode(params)}"
     
     response = RedirectResponse(url=auth_url)
+    # Set temporary oauth session cookie (expires in 10 minutes)
+    # Note: secure flag should be True in production with HTTPS
     response.set_cookie(
         key="oauth_session",
         value=session_token,
         httponly=True,
-        secure=False,
+        secure=settings.SECURE_COOKIES,
         samesite="lax",
         max_age=600
     )
